@@ -12,6 +12,17 @@ body { background: #0d1117; font-family: -apple-system, BlinkMacSystemFont, 'Seg
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .logo { font-size: 17px; font-weight: 700; color: #4ade80; }
 .lang-btn { background: #1e2530; border: 1px solid #2d3748; color: #fff; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; }
+
+/* KEY SETUP SCREEN */
+.key-screen { display: none; }
+.key-card { background: #161b27; border: 1px solid #2d3748; border-radius: 14px; padding: 20px; margin-bottom: 14px; }
+.key-title { color: #4ade80; font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+.key-desc { color: #94a3b8; font-size: 13px; line-height: 1.6; margin-bottom: 14px; }
+.key-input { width: 100%; background: #1e2530; border: 1px solid #2d3748; border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 14px; outline: none; margin-bottom: 10px; }
+.key-link { color: #4ade80; font-size: 13px; text-decoration: none; display: block; margin-bottom: 14px; }
+
+/* MAIN SCREEN */
+.main-screen { display: none; }
 .sport-input { width: 100%; background: #1e2530; border: 1px solid #2d3748; border-radius: 10px; padding: 12px 16px; color: #fff; font-size: 15px; margin-bottom: 14px; outline: none; }
 .upload-zone { width: 100%; background: #161b27; border: 2px dashed #2d3748; border-radius: 12px; padding: 24px 20px; text-align: center; cursor: pointer; margin-bottom: 8px; transition: border-color 0.2s; }
 .upload-zone:hover { border-color: #4ade80; }
@@ -21,14 +32,22 @@ body { background: #0d1117; font-family: -apple-system, BlinkMacSystemFont, 'Seg
 .paste-hint { color: #64748b; font-size: 12px; text-align: center; margin-bottom: 14px; }
 #preview { width: 100%; border-radius: 10px; display: none; }
 #file-input { display: none; }
-.btn-analyze { width: 100%; background: #4ade80; color: #0a0f1a; border: none; border-radius: 12px; padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
-.btn-analyze:hover { background: #22c55e; }
-.btn-analyze:disabled { background: #2d3748; color: #64748b; cursor: not-allowed; }
-.btn-retry { width: 100%; background: #1e2530; color: #94a3b8; border: 1px solid #2d3748; border-radius: 12px; padding: 13px; font-size: 15px; cursor: pointer; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.btn-retry:hover { background: #253040; }
+
+/* BUTTONS */
+.btn-green { width: 100%; background: #4ade80; color: #0a0f1a; border: none; border-radius: 12px; padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s; }
+.btn-green:hover { background: #22c55e; }
+.btn-green:disabled { background: #2d3748; color: #64748b; cursor: not-allowed; }
+.btn-gray { width: 100%; background: #1e2530; color: #94a3b8; border: 1px solid #2d3748; border-radius: 12px; padding: 13px; font-size: 15px; cursor: pointer; margin-bottom: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-gray:hover { background: #253040; }
+.btn-small-gray { background: none; border: none; color: #64748b; font-size: 12px; cursor: pointer; text-decoration: underline; margin-bottom: 14px; display: block; }
+
+/* LOADING & ERRORS */
 .loading { display: none; text-align: center; padding: 24px; color: #4ade80; font-size: 15px; }
 .loading-dots::after { content: '.'; animation: dots 1.2s infinite; }
 @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+.error-card { background: #1e1015; border: 1px solid #f87171; border-radius: 12px; padding: 16px; margin-bottom: 12px; color: #f87171; font-size: 13px; line-height: 1.6; display: none; }
+
+/* RESULTS */
 .result-section { display: none; margin-bottom: 14px; }
 .top-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 .top-card { background: #161b27; border: 1px solid #2d3748; border-radius: 12px; padding: 14px 16px; }
@@ -51,7 +70,6 @@ body { background: #0d1117; font-family: -apple-system, BlinkMacSystemFont, 'Seg
 .attempts-box { background: #161b27; border-left: 3px solid #4ade80; border-radius: 8px; padding: 14px 16px; color: #94a3b8; font-size: 14px; margin-bottom: 20px; text-align: center; }
 .attempts-box span { color: #fff; font-weight: 700; }
 .footer { text-align: center; color: #334155; font-size: 12px; }
-.error-card { background: #1e1015; border: 1px solid #f87171; border-radius: 12px; padding: 16px; margin-bottom: 12px; color: #f87171; font-size: 13px; line-height: 1.6; display: none; }
 </style>
 </head>
 <body>
@@ -61,49 +79,69 @@ body { background: #0d1117; font-family: -apple-system, BlinkMacSystemFont, 'Seg
     <button class="lang-btn">🇷🇺 RU</button>
   </div>
 
-  <input type="text" class="sport-input" placeholder="Футбол" id="sport-input" value="Футбол" />
-
-  <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
-    <div id="upload-placeholder">
-      <div class="upload-icon">📷</div>
-      <div class="upload-text">Загрузите изображение события</div>
-    </div>
-    <img id="preview" />
-  </div>
-  <input type="file" id="file-input" accept="image/*" />
-  <div class="paste-hint">Или просто вставьте скриншот (Ctrl + V)</div>
-
-  <div class="loading" id="loading"><span class="loading-dots">🔍 Анализирую коэффициенты</span></div>
-  <div class="error-card" id="error-card"></div>
-
-  <div class="result-section" id="result-section">
-    <div class="top-cards">
-      <div class="top-card">
-        <div class="top-card-label">Уверенность AI</div>
-        <div class="top-card-value" id="confidence">—</div>
+  <!-- ЭКРАН ВВОДА КЛЮЧА -->
+  <div class="key-screen" id="key-screen">
+    <div class="key-card">
+      <div class="key-title">🔑 Введите API ключ</div>
+      <div class="key-desc">
+        Для работы приложения нужен бесплатный ключ OpenRouter.<br><br>
+        1. Зайдите на <a class="key-link" href="https://openrouter.ai" target="_blank">openrouter.ai</a>
+        2. Войдите через Google<br>
+        3. Перейдите в Keys → Create Key<br>
+        4. Вставьте ключ сюда 👇
       </div>
-      <div class="top-card">
-        <div class="top-card-label">Надёжный сигнал</div>
-        <div class="top-card-signal" id="best-signal">—</div>
+      <input type="password" class="key-input" id="key-input" placeholder="sk-or-v1-..." />
+      <button class="btn-green" onclick="saveKey()">✅ Сохранить и начать</button>
+    </div>
+  </div>
+
+  <!-- ОСНОВНОЙ ЭКРАН -->
+  <div class="main-screen" id="main-screen">
+    <input type="text" class="sport-input" placeholder="Футбол" id="sport-input" value="Футбол" />
+
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+      <div id="upload-placeholder">
+        <div class="upload-icon">📷</div>
+        <div class="upload-text">Загрузите изображение события</div>
+      </div>
+      <img id="preview" />
+    </div>
+    <input type="file" id="file-input" accept="image/*" />
+    <div class="paste-hint">Или просто вставьте скриншот (Ctrl + V)</div>
+
+    <div class="loading" id="loading"><span class="loading-dots">🔍 Анализирую коэффициенты</span></div>
+    <div class="error-card" id="error-card"></div>
+
+    <div class="result-section" id="result-section">
+      <div class="top-cards">
+        <div class="top-card">
+          <div class="top-card-label">Уверенность AI</div>
+          <div class="top-card-value" id="confidence">—</div>
+        </div>
+        <div class="top-card">
+          <div class="top-card-label">Надёжный сигнал</div>
+          <div class="top-card-signal" id="best-signal">—</div>
+        </div>
+      </div>
+      <div class="bars-card">
+        <div class="bars-label">% событий</div>
+        <div id="bars-container"></div>
+      </div>
+      <div class="analytics-card">
+        <div class="analytics-label">AI Аналитика</div>
+        <div class="analytics-text" id="analytics-text">—</div>
       </div>
     </div>
-    <div class="bars-card">
-      <div class="bars-label">% событий</div>
-      <div id="bars-container"></div>
-    </div>
-    <div class="analytics-card">
-      <div class="analytics-label">AI Аналитика</div>
-      <div class="analytics-text" id="analytics-text">—</div>
-    </div>
-  </div>
 
-  <button class="btn-analyze" id="btn-analyze" onclick="analyze()">🔍 Проанализировать ставку</button>
-  <button class="btn-retry" onclick="reset()">🔄 Попробовать другое изображение</button>
+    <button class="btn-green" id="btn-analyze" onclick="analyze()">🔍 Проанализировать ставку</button>
+    <button class="btn-gray" onclick="reset()">🔄 Попробовать другое изображение</button>
+    <button class="btn-small-gray" onclick="changeKey()">⚙️ Изменить API ключ</button>
 
-  <div class="attempts-box">
-    Осталось попыток на сегодня: <span id="attempts">10</span> из <span>10</span>
+    <div class="attempts-box">
+      Осталось попыток на сегодня: <span id="attempts">10</span> из <span>10</span>
+    </div>
+    <div class="footer">Создано нейросетью BetAI · © 2025</div>
   </div>
-  <div class="footer">Создано нейросетью BetAI · © 2025</div>
 </div>
 
 <script>
@@ -112,11 +150,33 @@ if (window.Telegram && window.Telegram.WebApp) {
   window.Telegram.WebApp.expand();
 }
 
-const GEMINI_KEY = 'AQ.Ab8RN6JMJUWPv6AxQugkaiKBpmO2ySLBP_VRAtEQdikhOgLVAA';
-
 let attempts = 10;
 let imageBase64 = null;
 let imageMime = 'image/jpeg';
+
+function getKey() { return localStorage.getItem('or_key') || ''; }
+
+function init() {
+  if (getKey()) {
+    document.getElementById('key-screen').style.display = 'none';
+    document.getElementById('main-screen').style.display = 'block';
+  } else {
+    document.getElementById('key-screen').style.display = 'block';
+    document.getElementById('main-screen').style.display = 'none';
+  }
+}
+
+function saveKey() {
+  const val = document.getElementById('key-input').value.trim();
+  if (!val.startsWith('sk-or-')) { alert('Неверный ключ! Должен начинаться с sk-or-'); return; }
+  localStorage.setItem('or_key', val);
+  init();
+}
+
+function changeKey() {
+  localStorage.removeItem('or_key');
+  init();
+}
 
 const uploadZone = document.getElementById('upload-zone');
 const preview = document.getElementById('preview');
@@ -167,14 +227,13 @@ async function analyze() {
   errorCard.style.display = 'none';
 
   const sport = document.getElementById('sport-input').value || 'Спорт';
-
   const prompt = `Ты эксперт по анализу спортивных ставок. Посмотри на это фото с коэффициентами букмекера (${sport}).
 
 Задача:
 1. Найди все коэффициенты на фото и названия команд/событий
 2. Рассчитай вероятность каждого исхода: вероятность = (1 / коэффициент) * 100%
 3. Выбери 3-5 исходов с вероятностью 50-85%
-4. Определи лучший сигнал (самый надёжный исход с названием команды или типом ставки)
+4. Определи лучший сигнал (самый надёжный исход)
 5. Напиши короткую аналитику с названиями команд
 
 Ответь ТОЛЬКО валидным JSON без markdown:
@@ -189,42 +248,41 @@ async function analyze() {
 }`;
 
   try {
-    const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { inline_data: { mime_type: imageMime, data: imageBase64 } },
-              { text: prompt }
-            ]
-          }],
-          generationConfig: { temperature: 0.3, maxOutputTokens: 1000 }
-        })
-      }
-    );
+    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${getKey()}`,
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://cortanabox-sudo.github.io/betai-app/',
+        'X-Title': 'AI Секретный Анализ Ставок'
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.0-flash-exp:free',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image_url', image_url: { url: `data:${imageMime};base64,${imageBase64}` } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
 
     const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error?.message || 'Ошибка API');
 
-    if (!resp.ok) {
-      throw new Error(data.error?.message || 'API error');
-    }
-
-    let text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    let text = data.choices?.[0]?.message?.content || '';
     text = text.replace(/```json|```/g, '').trim();
-
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Не удалось распознать ответ');
+    if (!jsonMatch) throw new Error('Не удалось распознать ответ ИИ');
 
     const result = JSON.parse(jsonMatch[0]);
     showResult(result);
     attempts--;
     attemptsEl.textContent = attempts;
-
   } catch(e) {
-    errorCard.textContent = '❌ Ошибка: ' + e.message + '. Попробуйте ещё раз или загрузите другое фото.';
+    errorCard.textContent = '❌ Ошибка: ' + e.message;
     errorCard.style.display = 'block';
   }
 
@@ -253,7 +311,6 @@ function showResult(r) {
   });
 
   resultSection.style.display = 'block';
-
   setTimeout(() => {
     document.querySelectorAll('.bar-fill').forEach(b => {
       b.style.width = b.dataset.target + '%';
@@ -271,6 +328,8 @@ function reset() {
   errorCard.style.display = 'none';
   fileInput.value = '';
 }
+
+init();
 </script>
 </body>
 </html>
