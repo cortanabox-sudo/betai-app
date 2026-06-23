@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ставки от AI</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0d1117;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #fff;
+  min-height: 100vh;
+}
+.app { padding: 20px 16px; }
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.logo { font-size: 20px; font-weight: 600; color: #4ade80; }
+.lang-btn {
+  background: #1e2530;
+  border: 1px solid #2d3748;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.sport-input {
+  width: 100%;
+  background: #1e2530;
+  border: 1px solid #2d3748;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #fff;
+  font-size: 15px;
+  margin-bottom: 14px;
+  outline: none;
+}
+.upload-zone {
+  width: 100%;
+  background: #161b27;
+  border: 2px dashed #2d3748;
+  border-radius: 12px;
+  padding: 24px 20px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 8px;
+  transition: border-color 0.2s;
+}
+.upload-zone:hover { border-color: #4ade80; }
+.upload-zone.has-image { padding: 0; border: 2px solid #4ade80; overflow: hidden; }
+.upload-icon { font-size: 28px; margin-bottom: 8px; }
+.upload-text { color: #94a3b8; font-size: 14px; }
+.paste-hint { color: #64748b; font-size: 12px; text-align: center; margin-bottom: 14px; }
+#preview { width: 100%; border-radius: 10px; display: none; }
+#file-input { display: none; }
+.btn-analyze {
+  width: 100%;
+  background: #4ade80;
+  color: #0a0f1a;
+  border: none;
+  border-radius: 12px;
+  padding: 15px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.2s;
+}
+.btn-analyze:hover { background: #22c55e; }
+.btn-analyze:disabled { background: #2d3748; color: #64748b; cursor: not-allowed; }
+.btn-retry {
+  width: 100%;
+  background: #1e2530;
+  color: #94a3b8;
+  border: 1px solid #2d3748;
+  border-radius: 12px;
+  padding: 13px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-retry:hover { background: #253040; }
+.attempts-box {
+  background: #161b27;
+  border-left: 3px solid #4ade80;
+  border-radius: 8px;
+  padding: 14px 16px;
+  color: #94a3b8;
+  font-size: 14px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.attempts-box span { color: #fff; font-weight: 600; }
+.result-box {
+  background: #161b27;
+  border: 1px solid #2d3748;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+  display: none;
+}
+.result-title { color: #4ade80; font-size: 15px; font-weight: 600; margin-bottom: 10px; }
+.result-text { color: #cbd5e1; font-size: 14px; line-height: 1.7; white-space: pre-wrap; }
+.loading { display: none; text-align: center; padding: 20px; color: #4ade80; font-size: 14px; }
+.footer { text-align: center; color: #334155; font-size: 12px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div class="logo">💡 Ставки от AI</div>
+    <button class="lang-btn">🇷🇺 RU</button>
+  </div>
+
+  <input type="text" class="sport-input" placeholder="Футбол" id="sport-input" value="Футбол" />
+
+  <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+    <div id="upload-placeholder">
+      <div class="upload-icon">📷</div>
+      <div class="upload-text">Загрузите изображение события</div>
+    </div>
+    <img id="preview" />
+  </div>
+  <input type="file" id="file-input" accept="image/*" />
+
+  <div class="paste-hint">Или просто вставьте скриншот (Ctrl + V)</div>
+
+  <div class="loading" id="loading">🔍 Анализирую коэффициенты...</div>
+
+  <div class="result-box" id="result-box">
+    <div class="result-title">📊 Результат анализа</div>
+    <div class="result-text" id="result-text"></div>
+  </div>
+
+  <button class="btn-analyze" id="btn-analyze" onclick="analyze()">
+    🔍 Проанализировать ставку
+  </button>
+
+  <button class="btn-retry" onclick="reset()">
+    🔄 Попробовать другое изображение
+  </button>
+
+  <div class="attempts-box">
+    Осталось попыток на сегодня: <span id="attempts">10</span> из <span>10</span>
+  </div>
+
+  <div class="footer">Создано нейросетью BetAI · © 2025</div>
+</div>
+
+<script>
+if (window.Telegram && window.Telegram.WebApp) {
+  window.Telegram.WebApp.ready();
+  window.Telegram.WebApp.expand();
+}
+
+let attempts = 10;
+let imageBase64 = null;
+let imageMime = 'image/jpeg';
+
+const uploadZone = document.getElementById('upload-zone');
+const preview = document.getElementById('preview');
+const placeholder = document.getElementById('upload-placeholder');
+const fileInput = document.getElementById('file-input');
+const btnAnalyze = document.getElementById('btn-analyze');
+const loading = document.getElementById('loading');
+const resultBox = document.getElementById('result-box');
+const resultText = document.getElementById('result-text');
+const attemptsEl = document.getElementById('attempts');
+
+fileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (file) loadImage(file);
+});
+
+document.addEventListener('paste', e => {
+  for (let item of e.clipboardData.items) {
+    if (item.type.startsWith('image/')) { loadImage(item.getAsFile()); break; }
+  }
+});
+
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.style.borderColor = '#4ade80'; });
+uploadZone.addEventListener('dragleave', () => { uploadZone.style.borderColor = '#2d3748'; });
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadImage(file);
+});
+
+function loadImage(file) {
+  imageMime = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const data = ev.target.result;
+    imageBase64 = data.split(',')[1];
+    preview.src = data;
+    preview.style.display = 'block';
+    placeholder.style.display = 'none';
+    uploadZone.classList.add('has-image');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analyze() {
+  if (!imageBase64) { alert('Сначала загрузите изображение!'); return; }
+  if (attempts <= 0) { alert('Попытки на сегодня закончились!'); return; }
+
+  btnAnalyze.disabled = true;
+  loading.style.display = 'block';
+  resultBox.style.display = 'none';
+
+  const sport = document.getElementById('sport-input').value || 'Спорт';
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: imageMime, data: imageBase64 } },
+            { type: 'text', text: `Ты эксперт по анализу спортивных ставок (${sport}).\n\nПосмотри на это фото с коэффициентами и:\n1. Найди все события и их коэффициенты\n2. Выдели события с коэффициентом от 1.1 до 1.4 (самые надёжные)\n3. Дай чёткий прогноз на что лучше ставить\n\nОтвечай на русском языке в формате:\n📊 НАЙДЕННЫЕ СОБЫТИЯ:\n[список]\n\n✅ РЕКОМЕНДУЮ СТАВИТЬ:\n[варианты с объяснением]\n\n⚠️ РИСК: [оценка]` }
+          ]
+        }]
+      })
+    });
+
+    const data = await resp.json();
+    const text = data.content?.[0]?.text || 'Не удалось получить ответ';
+    resultText.textContent = text;
+    resultBox.style.display = 'block';
+    attempts--;
+    attemptsEl.textContent = attempts;
+  } catch(e) {
+    resultText.textContent = 'Ошибка при анализе. Попробуйте ещё раз.';
+    resultBox.style.display = 'block';
+  }
+
+  loading.style.display = 'none';
+  btnAnalyze.disabled = false;
+}
+
+function reset() {
+  imageBase64 = null;
+  preview.style.display = 'none';
+  preview.src = '';
+  placeholder.style.display = 'block';
+  uploadZone.classList.remove('has-image');
+  resultBox.style.display = 'none';
+  fileInput.value = '';
+}
+</script>
+</body>
+</html>
