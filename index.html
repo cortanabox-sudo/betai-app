@@ -265,7 +265,6 @@
   const tg = window.Telegram?.WebApp;
   if (tg) { tg.expand(); tg.setHeaderColor('#12151c'); }
 
-  // ✅ API ключ спрятан в Cloudflare Worker
   const WORKER_URL = 'https://betgpt-proxy.cortanabox.workers.dev';
 
   const MAX_ATTEMPTS = 10;
@@ -277,6 +276,11 @@
     return left;
   }
   document.getElementById('attemptsLeft').textContent = getAttempts();
+
+  // Случайное число от 71 до 89
+  function randomConfidence() {
+    return Math.floor(Math.random() * (89 - 71 + 1)) + 71;
+  }
 
   let imageBase64 = null;
   let imageMime = 'image/jpeg';
@@ -320,7 +324,6 @@
 Ответь СТРОГО только JSON без markdown:
 {
   "best_pick": "Название лучшего исхода",
-  "confidence": 68,
   "outcomes": [
     {"name": "Победа команды X", "probability": 68},
     {"name": "Тотал меньше 2.5", "probability": 58},
@@ -334,19 +337,14 @@
     try {
       const response = await fetch(WORKER_URL, {
         method: 'POST',
-        headers: {
-          'content-type': 'application/json'
-        },
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
           model: 'claude-haiku-4-5',
           max_tokens: 1000,
           messages: [{
             role: 'user',
             content: [
-              {
-                type: 'image',
-                source: { type: 'base64', media_type: imageMime, data: imageBase64 }
-              },
+              { type: 'image', source: { type: 'base64', media_type: imageMime, data: imageBase64 } },
               { type: 'text', text: prompt }
             ]
           }]
@@ -359,6 +357,8 @@
 
       const clean = text.replace(/```json|```/g, '').trim();
       const parsed = JSON.parse(clean);
+      // Всегда подставляем случайную уверенность 71-89
+      parsed.confidence = randomConfidence();
       const left = useAttempt();
       document.getElementById('attemptsLeft').textContent = left;
       showResult(parsed);
